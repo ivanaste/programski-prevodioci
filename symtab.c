@@ -155,18 +155,19 @@ void clear_symtab(void) {
 // Ispisuje sve elemente tabele simbola.
 void print_symtab(void) {
   static const char *symbol_kinds[] = { 
-    "NONE", "REG", "LIT", "FUN", "VAR", "PAR" };
+    "NONE", "REG", "LIT", "FUN", "VAR", "PAR", "TMP" };
   int i,j;
   printf("\n\nSYMBOL TABLE\n");
-  printf("\n       name           kind   type  atr1   atr2");
-  printf("\n-- ---------------- -------- ----  -----  -----");
+  printf("\n       name           kind   type  atr1   atr2      atr3");
+  printf("\n-- ---------------- -------- ----  -----  -----	-----");
   for(i = 0; i < first_empty; i++) {
-    printf("\n%2d %-19s %-4s %4d  %4d  %4d ", i, 
+    printf("\n%2d %-19s %-4s %4d  %4d  %4d %4d", i, 
     symbol_table[i].name, 
     symbol_kinds[(int)(logarithm2(symbol_table[i].kind))], 
     symbol_table[i].type, 
     symbol_table[i].atr1, 
-    symbol_table[i].atr2);
+    symbol_table[i].atr2,
+    symbol_table[i].atr3);
   }
   printf("\n\n");
 }

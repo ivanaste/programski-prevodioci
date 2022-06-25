@@ -16,6 +16,18 @@
 "else"               { return _ELSE; }
 "return"             { return _RETURN; }
 
+
+	/* moj deo */
+"template"	{return _TEMPLATE; }
+"typename"	{return _TYPENAME; }
+"T"		{ return _T; }
+
+
+","                  { return _COMMA; }
+"*"		     { return _POINTER; }
+"&"		     { return ACCESS; }
+	/* moj deo */
+
 "("                  { return _LPAREN; }
 ")"                  { return _RPAREN; }
 "{"                  { return _LBRACKET; }
@@ -24,7 +36,7 @@
 "="                  { return _ASSIGN; }
 
 "+"                  { yylval.i = ADD; return _AROP; }
-"-"                  { yylval.i = SUB; return _AROP; }
+"-"                  { yylval.i = SUB; return _AROP; }		
 
 "<"                  { yylval.i = LT; return _RELOP; }
 ">"                  { yylval.i = GT; return _RELOP; }

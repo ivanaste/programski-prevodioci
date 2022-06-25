@@ -18,7 +18,13 @@
   int var_num = 0;
   int fun_idx = -1;
   int fcall_idx = -1;
+  int tmpcall_idx = -1;
   int lab_num = -1;
+  
+  //moj deo
+  int param_idx = 0;
+  //moj deo
+  
   FILE *output;
 %}
 
@@ -42,12 +48,18 @@
 %token _SEMICOLON
 %token <i> _AROP
 %token <i> _RELOP
+%token _TEMPLATE
+%token _TYPENAME
+%token _T
+%token _COMMA	
 
 %type <i> num_exp exp literal
-%type <i> function_call argument rel_exp if_part
+%type <i> function_call argument arguments_template template_function_call
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
+%right OPERATOR
+
 
 %%
 
@@ -64,30 +76,76 @@ function_list
   | function_list function
   ;
 
-function
-  : _TYPE _ID
-      {
-        fun_idx = lookup_symbol($2, FUN);
-        if(fun_idx == NO_INDEX)
-          fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
-        else 
-          err("redefinition of function '%s'", $2);
 
-        code("\n%s:", $2);
-        code("\n\t\tPUSH\t%%14");
-        code("\n\t\tMOV \t%%15,%%14");
-      }
-    _LPAREN parameter _RPAREN body
-      {
-        clear_symbols(fun_idx + 1);
-        var_num = 0;
-        
-        code("\n@%s_exit:", $2);
-        code("\n\t\tMOV \t%%14,%%15");
-        code("\n\t\tPOP \t%%14");
-        code("\n\t\tRET");
-      }
+function
+	: template_function 
+	  | _TYPE _ID
+	      {
+		fun_idx = lookup_symbol($2, FUN|TMP);
+		if(fun_idx == NO_INDEX)
+		  fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
+		else 
+		  err("redefinition of function '%s'", $2);
+
+		code("\n%s:", $2);
+		code("\n\t\tPUSH\t%%14");
+		code("\n\t\tMOV \t%%15,%%14");
+	      }
+	    _LPAREN parameter _RPAREN body
+	      {
+		clear_symbols(fun_idx + 1);
+		var_num = 0;
+		
+		code("\n@%s_exit:", $2);
+		code("\n\t\tMOV \t%%14,%%15");
+		code("\n\t\tPOP \t%%14");
+		code("\n\t\tRET");
+		
+		fun_idx = -1;
+	      }
   ;
+  
+  
+template_function
+	: _TEMPLATE _RELOP _TYPENAME _T _RELOP
+	{
+		if ($2 != 0) err("allowed operator for template is <");
+		if ($5 != 1) err("allowed operator for template is >");
+	} _T _ID 
+	{
+		fun_idx = lookup_symbol($8, FUN|TMP);
+		if (fun_idx == NO_INDEX) 
+		  fun_idx = insert_symbol($8, TMP, 3, NO_ATR, NO_ATR);
+		else 
+		  err("redefinition of template '%s'", $8);
+		
+		param_idx = 0;
+
+	}
+	_LPAREN template_parameters _RPAREN body 
+	{
+		param_idx = 0;
+		fun_idx = -1;
+	}
+	;
+	
+template_parameters
+	: template_parameter
+	| template_parameters _COMMA template_parameter
+	;
+	
+template_parameter
+	: _T _ID
+	{	
+		param_idx = param_idx + 1;
+		//tip parametra je T, index parametra, kom templejtu pripada
+		insert_symbol($2, PAR, 3, param_idx, fun_idx);
+		//na kraju atr1 templejta je broj parametara (index poslednjeg param)
+		set_atr1(fun_idx, param_idx);
+		//set_atr2(fun_idx, $1);
+	}
+	;
+	
 
 parameter
   : /* empty */
@@ -100,6 +158,7 @@ parameter
         set_atr2(fun_idx, $1);
       }
   ;
+
 
 body
   : _LBRACKET variable_list
@@ -134,7 +193,6 @@ statement_list
 statement
   : compound_statement
   | assignment_statement
-  | if_statement
   | return_statement
   ;
 
@@ -152,6 +210,7 @@ assignment_statement
           if(get_type(idx) != get_type($3))
             err("incompatible types in assignment");
         gen_mov($3, idx);
+        print_symtab();
       }
   ;
 
@@ -178,6 +237,16 @@ num_exp
 
 exp
   : literal
+  
+  | function_call
+      {
+        $$ = take_reg();
+        gen_mov(FUN_REG, $$);
+      }
+   | template_function_call
+   {
+   	 $$ = tmpcall_idx;
+   }
 
   | _ID
       {
@@ -185,12 +254,7 @@ exp
         if($$ == NO_INDEX)
           err("'%s' undeclared", $1);
       }
-
-  | function_call
-      {
-        $$ = take_reg();
-        gen_mov(FUN_REG, $$);
-      }
+ 
   
   | _LPAREN num_exp _RPAREN
       { $$ = $2; }
@@ -203,15 +267,16 @@ literal
   | _UINT_NUMBER
       { $$ = insert_literal($1, UINT); }
   ;
+  
 
 function_call
-  : _ID 
+  : _ID _LPAREN
       {
         fcall_idx = lookup_symbol($1, FUN);
         if(fcall_idx == NO_INDEX)
           err("'%s' is not a function", $1);
       }
-    _LPAREN argument _RPAREN
+     argument _RPAREN
       {
         if(get_atr1(fcall_idx) != $4)
           err("wrong number of arguments");
@@ -222,7 +287,54 @@ function_call
         $$ = FUN_REG;
       }
   ;
+  
+template_function_call
+	: _ID _RELOP 
+	{
+		tmpcall_idx = lookup_symbol($1, TMP);
+		if(tmpcall_idx == NO_INDEX)
+		  err("'%s' is not a template", $1);
+	} _TYPE 
+	{	//postavljam atr2 na izabrani tip
+		set_atr2(tmpcall_idx, $4);
+		//type se postavlja zbog poredjenja return-a
+		set_type(tmpcall_idx, $4);
+	}
+	_RELOP _LPAREN arguments_template _RPAREN 
+	{
+		if(get_atr1(tmpcall_idx) != $8)
+		  err("wrong number of arguments");
+		  
+		//set_type(FUN_REG, get_type(tmpcall_idx));
+        	//$$ = FUN_REG;
+        	$$ = tmpcall_idx;
+	}
+      	;
+      
+      
+arguments_template
+	: argument_template
+	{ 
+		$$ = 1; 
+	}
+	| arguments_template 
+	_COMMA argument_template 
+	{
+		$$ = $$ + 1;	
+	}
+	;
+	
 
+argument_template
+	: num_exp
+	 { 
+	      if(get_atr2(tmpcall_idx) != get_type($1))
+		err("incompatible type for template argument");
+	 }
+  	;
+
+  
+ 
 argument
   : /* empty */
     { $$ = 0; }
@@ -238,42 +350,7 @@ argument
     }
   ;
 
-if_statement
-  : if_part %prec ONLY_IF
-      { code("\n@exit%d:", $1); }
 
-  | if_part _ELSE statement
-      { code("\n@exit%d:", $1); }
-  ;
-
-if_part
-  : _IF _LPAREN
-      {
-        $<i>$ = ++lab_num;
-        code("\n@if%d:", lab_num);
-      }
-    rel_exp
-      {
-        code("\n\t\t%s\t@false%d", opp_jumps[$4], $<i>3);
-        code("\n@true%d:", $<i>3);
-      }
-    _RPAREN statement
-      {
-        code("\n\t\tJMP \t@exit%d", $<i>3);
-        code("\n@false%d:", $<i>3);
-        $$ = $<i>3;
-      }
-  ;
-
-rel_exp
-  : num_exp _RELOP num_exp
-      {
-        if(get_type($1) != get_type($3))
-          err("invalid operands: relational operator");
-        $$ = $2 + ((get_type($1) - 1) * RELOP_NUMBER);
-        gen_cmp($1, $3);
-      }
-  ;
 
 return_statement
   : _RETURN num_exp _SEMICOLON
