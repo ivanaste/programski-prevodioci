@@ -10,7 +10,10 @@
 
 [ \t\n]+             { /* skip */ }
 
+"int*"               { yylval.i = POINTER_INT;  return _TYPE; }
+"unsigned*"          { yylval.i = POINTER_UNSIGNED;  return _TYPE; }
 "int"                { yylval.i = INT;  return _TYPE; }
+
 "unsigned"           { yylval.i = UINT; return _TYPE; }
 "if"                 { return _IF; }
 "else"               { return _ELSE; }
@@ -25,7 +28,7 @@
 
 ","                  { return _COMMA; }
 "*"		     { return _POINTER; }
-"&"		     { return _OSMICA; }
+"&"		     { return _AMPERSAND; }
 	/* moj deo */
 
 "("                  { return _LPAREN; }

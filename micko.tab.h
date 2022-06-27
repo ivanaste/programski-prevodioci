@@ -73,7 +73,7 @@ extern int yydebug;
     _TYPENAME = 274,               /* _TYPENAME  */
     _T = 275,                      /* _T  */
     _COMMA = 276,                  /* _COMMA  */
-    _OSMICA = 277,                 /* _OSMICA  */
+    _AMPERSAND = 277,              /* _AMPERSAND  */
     _POINTER = 278,                /* _POINTER  */
     ONLY_IF = 279,                 /* ONLY_IF  */
     OPERATOR = 280                 /* OPERATOR  */
@@ -85,7 +85,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 34 "micko.y"
+#line 35 "micko.y"
 
   int i;
   char *s;

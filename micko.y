@@ -26,6 +26,7 @@
   
   //moj deo
   int param_idx = 0;
+  int template_type = -1;
   //moj deo
   
   FILE *output;
@@ -55,7 +56,7 @@
 %token _TYPENAME
 %token _T
 %token _COMMA	
-%token _OSMICA
+%token _AMPERSAND
 %token _POINTER
 
 %type <i> num_exp exp literal
@@ -197,20 +198,26 @@ variable
       	
       	//provera da li postoji promenljiva u okviru funkcije
         if(varIndex == NO_INDEX || atr2 != fun_idx)
-           insert_symbol($2, VAR, $1, ++var_num, fun_idx);
+        	if ($1 != POINTER_INT && $1 != POINTER_UNSIGNED)
+			insert_symbol($2, VAR, $1, ++var_num, fun_idx);
+		else
+			insert_symbol($2, POINT, $1, ++var_num, fun_idx);
+           
         else 
            err("redefinition of '%s'", $2);
       }
   | _TYPE _POINTER _ID _SEMICOLON
   	{
-  	//FUN IDX TI MOZDA TREBA
   	
   	 int varIndex = lookup_symbol($3, VAR|PAR|POINT);
       	 int atr2 = get_atr2(varIndex);
-         if(varIndex == NO_INDEX || atr2 != fun_idx)
-           insert_symbol($3, POINT, $1, ++var_num, fun_idx);
+         if(varIndex == NO_INDEX || atr2 != fun_idx) 
+           insert_symbol($3, POINT, $1, ++var_num, NO_ATR);
+            
          else 
            err("redefinition of '%s'", $3);
+ 
+        
       }
   ;
 
@@ -233,26 +240,32 @@ compound_statement
 assignment_statement
   : _ID _ASSIGN num_exp _SEMICOLON
       {
-        int idx = lookup_symbol($1, VAR|PAR);
-        if(idx == NO_INDEX)
+        int idxLeft = lookup_symbol($1, VAR|PAR|POINT);
+       
+        if(idxLeft == NO_INDEX)
           err("invalid lvalue '%s' in assignment", $1);
         else
-          if((get_type(idx) != 3) && (get_type($3) != 3) && (get_type(idx) != get_type($3)))
+       	  if(get_type(idxLeft) == INT && (get_type($3) != INT && get_type($3) != POINTER_INT))
+            err("incompatible types in assignment");
+          else if(get_type(idxLeft) == UINT && (get_type($3) != UINT && get_type($3) != POINTER_UNSIGNED))
+            err("incompatible types in assignment");
+          else if((get_type(idxLeft) != 3) && (get_type($3) != 3) && (get_type(idxLeft) != get_type($3)))
             err("incompatible types in assignment");
             
-        gen_mov($3, idx);
+        gen_mov($3, idxLeft);
         
       }
-  | _ID _ASSIGN _OSMICA num_exp _SEMICOLON
+  | _ID _ASSIGN _AMPERSAND _ID _SEMICOLON
       {
-        int idx = lookup_symbol($1, POINT);
-        if(idx == NO_INDEX)
+        int idxLeft = lookup_symbol($1, POINT);
+        int idxRight = lookup_symbol($4, POINT|VAR|PAR);
+        if(idxLeft == NO_INDEX)
           err("invalid pointer '%s' in assignment", $1);
         else
-          if(get_type(idx) != get_type($4))
+          if(get_type(idxLeft) == POINTER_INT && get_type(idxRight) != INT)
             err("incompatible types in assignment");
-       
-        
+          else if(get_type(idxLeft) == POINTER_UNSIGNED && get_type(idxRight) != UINT)
+            err("incompatible types in assignment"); 
       }
   ;
 
@@ -261,9 +274,17 @@ num_exp
 
   | num_exp _AROP exp
       {
-        if(get_type($1) != 3 && get_type($3) != 3 && (get_type($1) != get_type($3)))
-          err("invalid operands: arithmetic operation");
-        int t1 = get_type($1);    
+      	if ($1 == INT || $1 == POINTER_INT && ($3 != INT || $3 != POINTER_INT)) 
+      		err("invalid operands: arithmetic operation '%i'  '%i'",get_type($1), get_type($3));
+      	else if ($1 == UINT || $1 == POINTER_UNSIGNED && ($3 != UINT || $3 != POINTER_UNSIGNED)) 
+      		err("invalid operands: arithmetic operation '%i'  '%i'",get_type($1), get_type($3));
+        //else if(get_type($1) != 3 && get_type($3) != 3 && (get_type($1) != get_type($3)))
+          //err("invalid operands: arithmetic operation AAA");
+        int t1 = get_type($1);   
+         
+        if (get_type($1) == 3) {
+        	t1 = 1;
+        }      
         
         code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
         gen_sym_name($1);
@@ -275,7 +296,7 @@ num_exp
         $$ = take_reg();
         gen_sym_name($$);
         set_type($$, t1);
-        print_symtab();
+    
       }
   ;
 
@@ -295,15 +316,22 @@ exp
 
   | _ID
       {
-        $$ = lookup_symbol($1, VAR|PAR);
+        $$ = lookup_symbol($1, VAR|PAR|POINT);
         if($$ == NO_INDEX)
           err("'%s' undeclared", $1);
       }
- 
-  
+ | _POINTER _ID
+      {
+        $$ = lookup_symbol($2, POINT);
+        if($$ == NO_INDEX)
+          err("pointer '%s' undeclared", $2);
+      }
+
   | _LPAREN num_exp _RPAREN
       { $$ = $2; }
   ;
+  
+  
 
 literal
   : _INT_NUMBER
@@ -345,6 +373,7 @@ template_function_call
 		//type se postavlja zbog poredjenja return-a
 		set_type(tmpcall_idx, $4);
 		arguments_number = 0;
+		template_type = $4;
 	}
 	_RELOP _LPAREN arguments_template _RPAREN 
 	{
@@ -422,9 +451,8 @@ argument
 return_statement
   : _RETURN num_exp _SEMICOLON
       {
-    
       	//ako je return T moze biti bilo koji tip
-        if(get_type(fun_idx) != 3 && get_type(fun_idx) != get_type($2))
+        if(get_type(fun_idx) != 3 && get_type(fun_idx) != get_type($2) && get_type($2) != 0)
           err("incompatible types in return");
         gen_mov($2, FUN_REG);
         code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));      
