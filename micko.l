@@ -25,7 +25,7 @@
 
 ","                  { return _COMMA; }
 "*"		     { return _POINTER; }
-"&"		     { return ACCESS; }
+"&"		     { return _OSMICA; }
 	/* moj deo */
 
 "("                  { return _LPAREN; }

@@ -73,8 +73,10 @@ extern int yydebug;
     _TYPENAME = 274,               /* _TYPENAME  */
     _T = 275,                      /* _T  */
     _COMMA = 276,                  /* _COMMA  */
-    ONLY_IF = 277,                 /* ONLY_IF  */
-    OPERATOR = 278                 /* OPERATOR  */
+    _OSMICA = 277,                 /* _OSMICA  */
+    _POINTER = 278,                /* _POINTER  */
+    ONLY_IF = 279,                 /* ONLY_IF  */
+    OPERATOR = 280                 /* OPERATOR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -83,12 +85,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 31 "micko.y"
+#line 34 "micko.y"
 
   int i;
   char *s;
 
-#line 92 "micko.tab.h"
+#line 94 "micko.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

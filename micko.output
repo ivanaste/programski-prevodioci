@@ -43,172 +43,176 @@ Grammar
    18              | variable_list variable
 
    19 variable: _TYPE _ID _SEMICOLON
+   20         | _TYPE _POINTER _ID _SEMICOLON
 
-   20 statement_list: ε
-   21               | statement_list statement
+   21 statement_list: ε
+   22               | statement_list statement
 
-   22 statement: compound_statement
-   23          | assignment_statement
-   24          | return_statement
+   23 statement: compound_statement
+   24          | assignment_statement
+   25          | return_statement
 
-   25 compound_statement: _LBRACKET statement_list _RBRACKET
+   26 compound_statement: _LBRACKET statement_list _RBRACKET
 
-   26 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON
+   27 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON
+   28                     | _ID _ASSIGN _OSMICA num_exp _SEMICOLON
 
-   27 num_exp: exp
-   28        | num_exp _AROP exp
+   29 num_exp: exp
+   30        | num_exp _AROP exp
 
-   29 exp: literal
-   30    | function_call
-   31    | template_function_call
-   32    | _ID
-   33    | _LPAREN num_exp _RPAREN
+   31 exp: literal
+   32    | function_call
+   33    | template_function_call
+   34    | _ID
+   35    | _LPAREN num_exp _RPAREN
 
-   34 literal: _INT_NUMBER
-   35        | _UINT_NUMBER
+   36 literal: _INT_NUMBER
+   37        | _UINT_NUMBER
 
-   36 $@5: ε
+   38 $@5: ε
 
-   37 function_call: _ID _LPAREN $@5 argument _RPAREN
+   39 function_call: _ID _LPAREN $@5 argument _RPAREN
 
-   38 $@6: ε
+   40 $@6: ε
 
-   39 $@7: ε
+   41 $@7: ε
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
+   42 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
 
-   41 arguments_template: argument_template
-   42                   | arguments_template _COMMA argument_template
+   43 arguments_template: argument_template
+   44                   | arguments_template _COMMA argument_template
 
-   43 argument_template: num_exp
+   45 argument_template: num_exp
 
-   44 argument: ε
-   45         | num_exp
+   46 argument: ε
+   47         | num_exp
 
-   46 return_statement: _RETURN num_exp _SEMICOLON
+   48 return_statement: _RETURN num_exp _SEMICOLON
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    _TYPE <i> (258) 6 14 19 40
+    _TYPE <i> (258) 6 14 19 20 42
     _IF (259)
     _ELSE (260)
-    _RETURN (261) 46
-    _ID <s> (262) 6 9 12 14 19 26 32 37 40
-    _INT_NUMBER <s> (263) 34
-    _UINT_NUMBER <s> (264) 35
-    _LPAREN (265) 6 9 33 37 40
-    _RPAREN (266) 6 9 33 37 40
-    _LBRACKET (267) 16 25
-    _RBRACKET (268) 16 25
-    _ASSIGN (269) 26
-    _SEMICOLON (270) 19 26 46
-    _AROP <i> (271) 28
-    _RELOP <i> (272) 9 40
+    _RETURN (261) 48
+    _ID <s> (262) 6 9 12 14 19 20 27 28 34 39 42
+    _INT_NUMBER <s> (263) 36
+    _UINT_NUMBER <s> (264) 37
+    _LPAREN (265) 6 9 35 39 42
+    _RPAREN (266) 6 9 35 39 42
+    _LBRACKET (267) 16 26
+    _RBRACKET (268) 16 26
+    _ASSIGN (269) 27 28
+    _SEMICOLON (270) 19 20 27 28 48
+    _AROP <i> (271) 30
+    _RELOP <i> (272) 9 42
     _TEMPLATE (273) 9
     _TYPENAME (274) 9
     _T (275) 9 12
-    _COMMA (276) 11 42
-    ONLY_IF (277)
-    OPERATOR (278)
+    _COMMA (276) 11 44
+    _OSMICA (277) 28
+    _POINTER (278) 20
+    ONLY_IF (279)
+    OPERATOR (280)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (24)
+    $accept (26)
         on left: 0
-    program (25)
+    program (27)
         on left: 1
         on right: 0
-    function_list (26)
+    function_list (28)
         on left: 2 3
         on right: 1 3
-    function (27)
+    function (29)
         on left: 4 6
         on right: 2 3
-    $@1 (28)
+    $@1 (30)
         on left: 5
         on right: 6
-    template_function (29)
+    template_function (31)
         on left: 9
         on right: 4
-    $@2 (30)
+    $@2 (32)
         on left: 7
         on right: 9
-    $@3 (31)
+    $@3 (33)
         on left: 8
         on right: 9
-    template_parameters (32)
+    template_parameters (34)
         on left: 10 11
         on right: 9 11
-    template_parameter (33)
+    template_parameter (35)
         on left: 12
         on right: 10 11
-    parameter (34)
+    parameter (36)
         on left: 13 14
         on right: 6
-    body (35)
+    body (37)
         on left: 16
         on right: 6 9
-    $@4 (36)
+    $@4 (38)
         on left: 15
         on right: 16
-    variable_list (37)
+    variable_list (39)
         on left: 17 18
         on right: 16 18
-    variable (38)
-        on left: 19
+    variable (40)
+        on left: 19 20
         on right: 18
-    statement_list (39)
-        on left: 20 21
-        on right: 16 21 25
-    statement (40)
-        on left: 22 23 24
-        on right: 21
-    compound_statement (41)
-        on left: 25
+    statement_list (41)
+        on left: 21 22
+        on right: 16 22 26
+    statement (42)
+        on left: 23 24 25
         on right: 22
-    assignment_statement (42)
+    compound_statement (43)
         on left: 26
         on right: 23
-    num_exp <i> (43)
+    assignment_statement (44)
         on left: 27 28
-        on right: 26 28 33 43 45 46
-    exp <i> (44)
-        on left: 29 30 31 32 33
-        on right: 27 28
-    literal <i> (45)
-        on left: 34 35
-        on right: 29
-    function_call <i> (46)
-        on left: 37
-        on right: 30
-    $@5 (47)
-        on left: 36
-        on right: 37
-    template_function_call <i> (48)
-        on left: 40
-        on right: 31
-    $@6 (49)
-        on left: 38
-        on right: 40
-    $@7 (50)
-        on left: 39
-        on right: 40
-    arguments_template <i> (51)
-        on left: 41 42
-        on right: 40 42
-    argument_template (52)
-        on left: 43
-        on right: 41 42
-    argument <i> (53)
-        on left: 44 45
-        on right: 37
-    return_statement (54)
-        on left: 46
         on right: 24
+    num_exp <i> (45)
+        on left: 29 30
+        on right: 27 28 30 35 45 47 48
+    exp <i> (46)
+        on left: 31 32 33 34 35
+        on right: 29 30
+    literal <i> (47)
+        on left: 36 37
+        on right: 31
+    function_call <i> (48)
+        on left: 39
+        on right: 32
+    $@5 (49)
+        on left: 38
+        on right: 39
+    template_function_call <i> (50)
+        on left: 42
+        on right: 33
+    $@6 (51)
+        on left: 40
+        on right: 42
+    $@7 (52)
+        on left: 41
+        on right: 42
+    arguments_template <i> (53)
+        on left: 43 44
+        on right: 42 44
+    argument_template <i> (54)
+        on left: 45
+        on right: 43 44
+    argument <i> (55)
+        on left: 46 47
+        on right: 39
+    return_statement (56)
+        on left: 48
+        on right: 25
 
 
 State 0
@@ -429,17 +433,19 @@ State 25
 State 26
 
    19 variable: _TYPE • _ID _SEMICOLON
+   20         | _TYPE • _POINTER _ID _SEMICOLON
 
-    _ID  shift, and go to state 30
+    _ID       shift, and go to state 30
+    _POINTER  shift, and go to state 31
 
 
 State 27
 
    16 body: _LBRACKET variable_list $@4 • statement_list _RBRACKET
 
-    $default  reduce using rule 20 (statement_list)
+    $default  reduce using rule 21 (statement_list)
 
-    statement_list  go to state 31
+    statement_list  go to state 32
 
 
 State 28
@@ -453,518 +459,574 @@ State 29
 
     9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 • _LPAREN template_parameters _RPAREN body
 
-    _LPAREN  shift, and go to state 32
+    _LPAREN  shift, and go to state 33
 
 
 State 30
 
    19 variable: _TYPE _ID • _SEMICOLON
 
-    _SEMICOLON  shift, and go to state 33
+    _SEMICOLON  shift, and go to state 34
 
 
 State 31
 
-   16 body: _LBRACKET variable_list $@4 statement_list • _RBRACKET
-   21 statement_list: statement_list • statement
+   20 variable: _TYPE _POINTER • _ID _SEMICOLON
 
-    _RETURN    shift, and go to state 34
-    _ID        shift, and go to state 35
-    _LBRACKET  shift, and go to state 36
-    _RBRACKET  shift, and go to state 37
-
-    statement             go to state 38
-    compound_statement    go to state 39
-    assignment_statement  go to state 40
-    return_statement      go to state 41
+    _ID  shift, and go to state 35
 
 
 State 32
 
-    9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 _LPAREN • template_parameters _RPAREN body
+   16 body: _LBRACKET variable_list $@4 statement_list • _RBRACKET
+   22 statement_list: statement_list • statement
 
-    _T  shift, and go to state 42
+    _RETURN    shift, and go to state 36
+    _ID        shift, and go to state 37
+    _LBRACKET  shift, and go to state 38
+    _RBRACKET  shift, and go to state 39
 
-    template_parameters  go to state 43
-    template_parameter   go to state 44
+    statement             go to state 40
+    compound_statement    go to state 41
+    assignment_statement  go to state 42
+    return_statement      go to state 43
 
 
 State 33
+
+    9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 _LPAREN • template_parameters _RPAREN body
+
+    _T  shift, and go to state 44
+
+    template_parameters  go to state 45
+    template_parameter   go to state 46
+
+
+State 34
 
    19 variable: _TYPE _ID _SEMICOLON •
 
     $default  reduce using rule 19 (variable)
 
 
-State 34
-
-   46 return_statement: _RETURN • num_exp _SEMICOLON
-
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
-
-    num_exp                 go to state 49
-    exp                     go to state 50
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
-
-
 State 35
 
-   26 assignment_statement: _ID • _ASSIGN num_exp _SEMICOLON
+   20 variable: _TYPE _POINTER _ID • _SEMICOLON
 
-    _ASSIGN  shift, and go to state 54
+    _SEMICOLON  shift, and go to state 47
 
 
 State 36
 
-   25 compound_statement: _LBRACKET • statement_list _RBRACKET
+   48 return_statement: _RETURN • num_exp _SEMICOLON
 
-    $default  reduce using rule 20 (statement_list)
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
 
-    statement_list  go to state 55
+    num_exp                 go to state 52
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
 
 
 State 37
+
+   27 assignment_statement: _ID • _ASSIGN num_exp _SEMICOLON
+   28                     | _ID • _ASSIGN _OSMICA num_exp _SEMICOLON
+
+    _ASSIGN  shift, and go to state 57
+
+
+State 38
+
+   26 compound_statement: _LBRACKET • statement_list _RBRACKET
+
+    $default  reduce using rule 21 (statement_list)
+
+    statement_list  go to state 58
+
+
+State 39
 
    16 body: _LBRACKET variable_list $@4 statement_list _RBRACKET •
 
     $default  reduce using rule 16 (body)
 
 
-State 38
-
-   21 statement_list: statement_list statement •
-
-    $default  reduce using rule 21 (statement_list)
-
-
-State 39
-
-   22 statement: compound_statement •
-
-    $default  reduce using rule 22 (statement)
-
-
 State 40
 
-   23 statement: assignment_statement •
+   22 statement_list: statement_list statement •
 
-    $default  reduce using rule 23 (statement)
+    $default  reduce using rule 22 (statement_list)
 
 
 State 41
 
-   24 statement: return_statement •
+   23 statement: compound_statement •
 
-    $default  reduce using rule 24 (statement)
+    $default  reduce using rule 23 (statement)
 
 
 State 42
 
-   12 template_parameter: _T • _ID
+   24 statement: assignment_statement •
 
-    _ID  shift, and go to state 56
+    $default  reduce using rule 24 (statement)
 
 
 State 43
 
-    9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 _LPAREN template_parameters • _RPAREN body
-   11 template_parameters: template_parameters • _COMMA template_parameter
+   25 statement: return_statement •
 
-    _RPAREN  shift, and go to state 57
-    _COMMA   shift, and go to state 58
+    $default  reduce using rule 25 (statement)
 
 
 State 44
+
+   12 template_parameter: _T • _ID
+
+    _ID  shift, and go to state 59
+
+
+State 45
+
+    9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 _LPAREN template_parameters • _RPAREN body
+   11 template_parameters: template_parameters • _COMMA template_parameter
+
+    _RPAREN  shift, and go to state 60
+    _COMMA   shift, and go to state 61
+
+
+State 46
 
    10 template_parameters: template_parameter •
 
     $default  reduce using rule 10 (template_parameters)
 
 
-State 45
-
-   32 exp: _ID •
-   37 function_call: _ID • _LPAREN $@5 argument _RPAREN
-   40 template_function_call: _ID • _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
-
-    _LPAREN  shift, and go to state 59
-    _RELOP   shift, and go to state 60
-
-    $default  reduce using rule 32 (exp)
-
-
-State 46
-
-   34 literal: _INT_NUMBER •
-
-    $default  reduce using rule 34 (literal)
-
-
 State 47
 
-   35 literal: _UINT_NUMBER •
+   20 variable: _TYPE _POINTER _ID _SEMICOLON •
 
-    $default  reduce using rule 35 (literal)
+    $default  reduce using rule 20 (variable)
 
 
 State 48
 
-   33 exp: _LPAREN • num_exp _RPAREN
+   34 exp: _ID •
+   39 function_call: _ID • _LPAREN $@5 argument _RPAREN
+   42 template_function_call: _ID • _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
 
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
+    _LPAREN  shift, and go to state 62
+    _RELOP   shift, and go to state 63
 
-    num_exp                 go to state 61
-    exp                     go to state 50
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
+    $default  reduce using rule 34 (exp)
 
 
 State 49
 
-   28 num_exp: num_exp • _AROP exp
-   46 return_statement: _RETURN num_exp • _SEMICOLON
+   36 literal: _INT_NUMBER •
 
-    _SEMICOLON  shift, and go to state 62
-    _AROP       shift, and go to state 63
+    $default  reduce using rule 36 (literal)
 
 
 State 50
 
-   27 num_exp: exp •
+   37 literal: _UINT_NUMBER •
 
-    $default  reduce using rule 27 (num_exp)
+    $default  reduce using rule 37 (literal)
 
 
 State 51
 
-   29 exp: literal •
+   35 exp: _LPAREN • num_exp _RPAREN
 
-    $default  reduce using rule 29 (exp)
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+
+    num_exp                 go to state 64
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
 
 
 State 52
 
-   30 exp: function_call •
+   30 num_exp: num_exp • _AROP exp
+   48 return_statement: _RETURN num_exp • _SEMICOLON
 
-    $default  reduce using rule 30 (exp)
+    _SEMICOLON  shift, and go to state 65
+    _AROP       shift, and go to state 66
 
 
 State 53
 
-   31 exp: template_function_call •
+   29 num_exp: exp •
 
-    $default  reduce using rule 31 (exp)
+    $default  reduce using rule 29 (num_exp)
 
 
 State 54
 
-   26 assignment_statement: _ID _ASSIGN • num_exp _SEMICOLON
+   31 exp: literal •
 
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
-
-    num_exp                 go to state 64
-    exp                     go to state 50
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
+    $default  reduce using rule 31 (exp)
 
 
 State 55
 
-   21 statement_list: statement_list • statement
-   25 compound_statement: _LBRACKET statement_list • _RBRACKET
+   32 exp: function_call •
 
-    _RETURN    shift, and go to state 34
-    _ID        shift, and go to state 35
-    _LBRACKET  shift, and go to state 36
-    _RBRACKET  shift, and go to state 65
-
-    statement             go to state 38
-    compound_statement    go to state 39
-    assignment_statement  go to state 40
-    return_statement      go to state 41
+    $default  reduce using rule 32 (exp)
 
 
 State 56
+
+   33 exp: template_function_call •
+
+    $default  reduce using rule 33 (exp)
+
+
+State 57
+
+   27 assignment_statement: _ID _ASSIGN • num_exp _SEMICOLON
+   28                     | _ID _ASSIGN • _OSMICA num_exp _SEMICOLON
+
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+    _OSMICA       shift, and go to state 67
+
+    num_exp                 go to state 68
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
+
+
+State 58
+
+   22 statement_list: statement_list • statement
+   26 compound_statement: _LBRACKET statement_list • _RBRACKET
+
+    _RETURN    shift, and go to state 36
+    _ID        shift, and go to state 37
+    _LBRACKET  shift, and go to state 38
+    _RBRACKET  shift, and go to state 69
+
+    statement             go to state 40
+    compound_statement    go to state 41
+    assignment_statement  go to state 42
+    return_statement      go to state 43
+
+
+State 59
 
    12 template_parameter: _T _ID •
 
     $default  reduce using rule 12 (template_parameter)
 
 
-State 57
+State 60
 
     9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 _LPAREN template_parameters _RPAREN • body
 
     _LBRACKET  shift, and go to state 21
 
-    body  go to state 66
-
-
-State 58
-
-   11 template_parameters: template_parameters _COMMA • template_parameter
-
-    _T  shift, and go to state 42
-
-    template_parameter  go to state 67
-
-
-State 59
-
-   37 function_call: _ID _LPAREN • $@5 argument _RPAREN
-
-    $default  reduce using rule 36 ($@5)
-
-    $@5  go to state 68
-
-
-State 60
-
-   40 template_function_call: _ID _RELOP • $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
-
-    $default  reduce using rule 38 ($@6)
-
-    $@6  go to state 69
+    body  go to state 70
 
 
 State 61
 
-   28 num_exp: num_exp • _AROP exp
-   33 exp: _LPAREN num_exp • _RPAREN
+   11 template_parameters: template_parameters _COMMA • template_parameter
 
-    _RPAREN  shift, and go to state 70
-    _AROP    shift, and go to state 63
+    _T  shift, and go to state 44
+
+    template_parameter  go to state 71
 
 
 State 62
 
-   46 return_statement: _RETURN num_exp _SEMICOLON •
+   39 function_call: _ID _LPAREN • $@5 argument _RPAREN
 
-    $default  reduce using rule 46 (return_statement)
+    $default  reduce using rule 38 ($@5)
+
+    $@5  go to state 72
 
 
 State 63
 
-   28 num_exp: num_exp _AROP • exp
+   42 template_function_call: _ID _RELOP • $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
 
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
+    $default  reduce using rule 40 ($@6)
 
-    exp                     go to state 71
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
+    $@6  go to state 73
 
 
 State 64
 
-   26 assignment_statement: _ID _ASSIGN num_exp • _SEMICOLON
-   28 num_exp: num_exp • _AROP exp
+   30 num_exp: num_exp • _AROP exp
+   35 exp: _LPAREN num_exp • _RPAREN
 
-    _SEMICOLON  shift, and go to state 72
-    _AROP       shift, and go to state 63
+    _RPAREN  shift, and go to state 74
+    _AROP    shift, and go to state 66
 
 
 State 65
 
-   25 compound_statement: _LBRACKET statement_list _RBRACKET •
+   48 return_statement: _RETURN num_exp _SEMICOLON •
 
-    $default  reduce using rule 25 (compound_statement)
+    $default  reduce using rule 48 (return_statement)
 
 
 State 66
+
+   30 num_exp: num_exp _AROP • exp
+
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+
+    exp                     go to state 75
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
+
+
+State 67
+
+   28 assignment_statement: _ID _ASSIGN _OSMICA • num_exp _SEMICOLON
+
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+
+    num_exp                 go to state 76
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
+
+
+State 68
+
+   27 assignment_statement: _ID _ASSIGN num_exp • _SEMICOLON
+   30 num_exp: num_exp • _AROP exp
+
+    _SEMICOLON  shift, and go to state 77
+    _AROP       shift, and go to state 66
+
+
+State 69
+
+   26 compound_statement: _LBRACKET statement_list _RBRACKET •
+
+    $default  reduce using rule 26 (compound_statement)
+
+
+State 70
 
     9 template_function: _TEMPLATE _RELOP _TYPENAME _T _RELOP $@2 _T _ID $@3 _LPAREN template_parameters _RPAREN body •
 
     $default  reduce using rule 9 (template_function)
 
 
-State 67
+State 71
 
    11 template_parameters: template_parameters _COMMA template_parameter •
 
     $default  reduce using rule 11 (template_parameters)
 
 
-State 68
-
-   37 function_call: _ID _LPAREN $@5 • argument _RPAREN
-
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
-
-    $default  reduce using rule 44 (argument)
-
-    num_exp                 go to state 73
-    exp                     go to state 50
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
-    argument                go to state 74
-
-
-State 69
-
-   40 template_function_call: _ID _RELOP $@6 • _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
-
-    _TYPE  shift, and go to state 75
-
-
-State 70
-
-   33 exp: _LPAREN num_exp _RPAREN •
-
-    $default  reduce using rule 33 (exp)
-
-
-State 71
-
-   28 num_exp: num_exp _AROP exp •
-
-    $default  reduce using rule 28 (num_exp)
-
-
 State 72
 
-   26 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON •
+   39 function_call: _ID _LPAREN $@5 • argument _RPAREN
 
-    $default  reduce using rule 26 (assignment_statement)
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+
+    $default  reduce using rule 46 (argument)
+
+    num_exp                 go to state 78
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
+    argument                go to state 79
 
 
 State 73
 
-   28 num_exp: num_exp • _AROP exp
-   45 argument: num_exp •
+   42 template_function_call: _ID _RELOP $@6 • _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN
 
-    _AROP  shift, and go to state 63
-
-    $default  reduce using rule 45 (argument)
+    _TYPE  shift, and go to state 80
 
 
 State 74
 
-   37 function_call: _ID _LPAREN $@5 argument • _RPAREN
+   35 exp: _LPAREN num_exp _RPAREN •
 
-    _RPAREN  shift, and go to state 76
+    $default  reduce using rule 35 (exp)
 
 
 State 75
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE • $@7 _RELOP _LPAREN arguments_template _RPAREN
+   30 num_exp: num_exp _AROP exp •
 
-    $default  reduce using rule 39 ($@7)
-
-    $@7  go to state 77
+    $default  reduce using rule 30 (num_exp)
 
 
 State 76
 
-   37 function_call: _ID _LPAREN $@5 argument _RPAREN •
+   28 assignment_statement: _ID _ASSIGN _OSMICA num_exp • _SEMICOLON
+   30 num_exp: num_exp • _AROP exp
 
-    $default  reduce using rule 37 (function_call)
+    _SEMICOLON  shift, and go to state 81
+    _AROP       shift, and go to state 66
 
 
 State 77
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE $@7 • _RELOP _LPAREN arguments_template _RPAREN
+   27 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON •
 
-    _RELOP  shift, and go to state 78
+    $default  reduce using rule 27 (assignment_statement)
 
 
 State 78
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP • _LPAREN arguments_template _RPAREN
+   30 num_exp: num_exp • _AROP exp
+   47 argument: num_exp •
 
-    _LPAREN  shift, and go to state 79
+    _AROP  shift, and go to state 66
+
+    $default  reduce using rule 47 (argument)
 
 
 State 79
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN • arguments_template _RPAREN
+   39 function_call: _ID _LPAREN $@5 argument • _RPAREN
 
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
-
-    num_exp                 go to state 80
-    exp                     go to state 50
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
-    arguments_template      go to state 81
-    argument_template       go to state 82
+    _RPAREN  shift, and go to state 82
 
 
 State 80
 
-   28 num_exp: num_exp • _AROP exp
-   43 argument_template: num_exp •
+   42 template_function_call: _ID _RELOP $@6 _TYPE • $@7 _RELOP _LPAREN arguments_template _RPAREN
 
-    _AROP  shift, and go to state 63
+    $default  reduce using rule 41 ($@7)
 
-    $default  reduce using rule 43 (argument_template)
+    $@7  go to state 83
 
 
 State 81
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template • _RPAREN
-   42 arguments_template: arguments_template • _COMMA argument_template
+   28 assignment_statement: _ID _ASSIGN _OSMICA num_exp _SEMICOLON •
 
-    _RPAREN  shift, and go to state 83
-    _COMMA   shift, and go to state 84
+    $default  reduce using rule 28 (assignment_statement)
 
 
 State 82
 
-   41 arguments_template: argument_template •
+   39 function_call: _ID _LPAREN $@5 argument _RPAREN •
 
-    $default  reduce using rule 41 (arguments_template)
+    $default  reduce using rule 39 (function_call)
 
 
 State 83
 
-   40 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN •
+   42 template_function_call: _ID _RELOP $@6 _TYPE $@7 • _RELOP _LPAREN arguments_template _RPAREN
 
-    $default  reduce using rule 40 (template_function_call)
+    _RELOP  shift, and go to state 84
 
 
 State 84
 
-   42 arguments_template: arguments_template _COMMA • argument_template
+   42 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP • _LPAREN arguments_template _RPAREN
 
-    _ID           shift, and go to state 45
-    _INT_NUMBER   shift, and go to state 46
-    _UINT_NUMBER  shift, and go to state 47
-    _LPAREN       shift, and go to state 48
-
-    num_exp                 go to state 80
-    exp                     go to state 50
-    literal                 go to state 51
-    function_call           go to state 52
-    template_function_call  go to state 53
-    argument_template       go to state 85
+    _LPAREN  shift, and go to state 85
 
 
 State 85
 
-   42 arguments_template: arguments_template _COMMA argument_template •
+   42 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN • arguments_template _RPAREN
 
-    $default  reduce using rule 42 (arguments_template)
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+
+    num_exp                 go to state 86
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
+    arguments_template      go to state 87
+    argument_template       go to state 88
+
+
+State 86
+
+   30 num_exp: num_exp • _AROP exp
+   45 argument_template: num_exp •
+
+    _AROP  shift, and go to state 66
+
+    $default  reduce using rule 45 (argument_template)
+
+
+State 87
+
+   42 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template • _RPAREN
+   44 arguments_template: arguments_template • _COMMA argument_template
+
+    _RPAREN  shift, and go to state 89
+    _COMMA   shift, and go to state 90
+
+
+State 88
+
+   43 arguments_template: argument_template •
+
+    $default  reduce using rule 43 (arguments_template)
+
+
+State 89
+
+   42 template_function_call: _ID _RELOP $@6 _TYPE $@7 _RELOP _LPAREN arguments_template _RPAREN •
+
+    $default  reduce using rule 42 (template_function_call)
+
+
+State 90
+
+   44 arguments_template: arguments_template _COMMA • argument_template
+
+    _ID           shift, and go to state 48
+    _INT_NUMBER   shift, and go to state 49
+    _UINT_NUMBER  shift, and go to state 50
+    _LPAREN       shift, and go to state 51
+
+    num_exp                 go to state 86
+    exp                     go to state 53
+    literal                 go to state 54
+    function_call           go to state 55
+    template_function_call  go to state 56
+    argument_template       go to state 91
+
+
+State 91
+
+   44 arguments_template: arguments_template _COMMA argument_template •
+
+    $default  reduce using rule 44 (arguments_template)
